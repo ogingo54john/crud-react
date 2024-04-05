@@ -33,35 +33,29 @@ module.exports.deleteEmployeeById = async(id)=>{
     }
 }
 
-// add or edit employee
+// add employee
 
-module.exports.addOrEditEmployee = async(req, res)=>{
+module.exports.addOrEditEmployee = async (obj, id = 0) => {
     try {
         const connection = await db;
-        const { emp_id, emp_name, emp_employee_code, emp_salary } = req.body;
-        if (emp_id) {
-            // Edit operation: Call the stored procedure to update the employee
-            db.query('CALL updateEmployee(?, ?, ?, ?)', [emp_id, emp_name, emp_employee_code, emp_salary], (error, results) => {
-                if (error) {
-                    console.error('Error updating employee:', error);
-                    return res.status(500).json({ error: 'Error updating employee' });
-                }
-                res.status(200).json({ message: 'Employee updated successfully' });
-            });
-        } else {
-            // Add operation: Implement your logic to insert a new employee into the database
-            // This would typically involve executing an INSERT INTO query
-            // Example:
-            // db.query('INSERT INTO employees (name, employee_code, salary) VALUES (?, ?, ?)', [emp_name, emp_employee_code, emp_salary], (error, results) => {
-            //     if (error) {
-            //         console.error('Error adding employee:', error);
-            //         return res.status(500).json({ error: 'Error adding employee' });
-            //     }
-            //     res.status(201).json({ message: 'Employee added successfully', emp_id: results.insertId });
-            // });
-        }
+        const [result] = await connection.query("CALL updateEmployee(?,?,?,?)", [id, obj.name, obj.employee_code, obj.salary]);
+        
     } catch (error) {
-        console.error("Errror deleting",error)
-        throw error
+        console.error("Error in addOrEditEmployee:", error);
+        res.status()
+        throw error;
     }
-}
+};
+
+// edit employee
+module.exports.updateEmployee = async (id, name, employee_code, salary) => {
+    try {
+        const connection = await db;
+        const [result] = await connection.query("CALL updateEmployee(?,?,?,?)", [id, name, employee_code, salary]);
+        return result;
+    } catch (error) {
+        console.error('Error updating employee', error);
+        throw error;
+    }
+};
+
